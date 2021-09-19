@@ -15,6 +15,10 @@ class AuthService {
         .map((User? user) => _customUserForFirebaseUser(user!));
   }
 
+  String getUID() {
+    return _auth.currentUser.uid;
+  }
+
   // sign in with email and password
   Future signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -35,13 +39,21 @@ class AuthService {
   Future registerWithEmailAndPassword(
       String email, String password, String healthCardNo, String name) async {
     try {
+      bool isRecordPresent =
+          await DatabaseService().checkVaxDatabase(healthCardNo);
+
+      if (!isRecordPresent) {
+        print('health record not found');
+        return null;
+      }
+
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
       User? user = _auth.currentUser!;
 
-      await DatabaseService(uid: user.uid)
-          .updateUserData(name, email, healthCardNo);
+      await DatabaseService()
+          .updateUserData(user.uid, name, email, healthCardNo);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');

@@ -1,11 +1,17 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_import
 
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:vax_pass_flutter/models/user.dart';
 import 'package:vax_pass_flutter/screens/sign_in_screen.dart';
 import 'package:vax_pass_flutter/screens/sign_up_screen.dart';
 import 'package:vax_pass_flutter/utils/constants.dart';
+
+import 'package:vax_pass_flutter/service/auth.dart';
+import 'package:vax_pass_flutter/service/database.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen() : super();
@@ -15,6 +21,22 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final AuthService _auth = AuthService();
+  final DatabaseService _database = DatabaseService();
+
+  HealthRecord? _record;
+  UserData? _userData;
+
+  _DashboardScreenState() {
+    _setHealthRecord();
+  }
+
+  void _setHealthRecord() async {
+    String uid = _auth.getUID();
+    _record = await _database.getUserHealthRecord(uid);
+    _userData = await _database.getUserData(uid);
+  }
+
   Widget _label(String label, String value) {
     return Align(
         alignment: Alignment.centerLeft,
@@ -27,7 +49,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ));
   }
 
-  Widget _dosageCard(String dose, String agent, String prodName, String loc) {
+  Widget _dosageCard(
+      String dose, String agent, String prodName, String loc, String date) {
     return FractionallySizedBox(
       widthFactor: 1.0,
       child: Container(
@@ -43,7 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       fontFamily: 'OpenSans',
                       fontSize: 40)),
             ),
-            _label("Date", "00/00/0000"),
+            _label("Date", date),
             _label("Agent", agent),
             _label("Product Name", prodName),
             _label("Location Administered", loc)
@@ -53,7 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _titleCard() {
+  Widget _titleCard(String date, String hcn) {
     return FractionallySizedBox(
       widthFactor: 1.0,
       child: Container(
@@ -69,8 +92,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       fontFamily: 'OpenSans',
                       fontSize: 40)),
             ),
-            _label("Date of Birth", "00/00/0000"),
-            _label("Health Card No.", "0000-000-000-AB")
+            _label("Date of Birth", date),
+            _label("Health Card No.", hcn)
           ],
         ),
       ),
@@ -110,19 +133,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    _titleCard(),
+                    _titleCard(_record!.dateOfBirth, _userData!.healthCardNo),
                     SizedBox(height: 10),
                     _dosageCard(
                         "Dose 1",
-                        "Covid-19_mRNA",
-                        "PFIZER-BIONTECH COVID-19VACCINE mRNA",
-                        "Cambridge On, Canada"),
+                        "Covid-19 mRNA",
+                        _record!.doseOneAgent,
+                        _record!.doseOneLocation,
+                        _record!.doseOneDate),
                     SizedBox(height: 10),
                     _dosageCard(
                         "Dose 2",
                         "Covid-19_mRNA",
-                        "PFIZER-BIONTECH COVID-19VACCINE mRNA",
-                        "Cambridge On, Canada"),
+                        _record!.doseTwoAgent,
+                        _record!.doseTwoLocation,
+                        _record!.doseTwoDate),
                     SizedBox(height: 10),
                     _qrCard()
                   ],
