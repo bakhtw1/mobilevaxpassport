@@ -1,5 +1,7 @@
 ### Youtube Link: https://youtu.be/SbXvPBVddBY
 
+![App Screens](img/thumb.png)
+
 ## Inspiration
 There is a need for a vaccine passport utility (whether it be an app or physical) to verify those individuals who have received a Covid-19 vaccine. Although this concept of vaccine verification has become somewhat controversial, many governments around the world are discussing their use and most have already begun to produce some sort of vaccine verification system. This is my take on the problem.
 
