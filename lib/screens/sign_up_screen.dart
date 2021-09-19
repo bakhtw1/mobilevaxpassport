@@ -5,6 +5,16 @@ import 'package:flutter/services.dart';
 import 'package:vax_pass_flutter/screens/sign_in_screen.dart';
 import 'package:vax_pass_flutter/utils/constants.dart';
 
+import 'package:vax_pass_flutter/service/auth.dart';
+
+class SignUpForm {
+  String email = '';
+  String password = '';
+  String healthCardNo = '';
+
+  SignUpForm() {}
+}
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen() : super();
 
@@ -13,6 +23,13 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final AuthService _auth = AuthService();
+
+  String _email = '';
+  String _password = '';
+  String _healtCardNo = '';
+  String _name = '';
+
   Widget _buildSignInBtn() {
     return GestureDetector(
       onTap: () => {
@@ -53,7 +70,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         width: double.infinity,
         child: RaisedButton(
           elevation: 5.0,
-          onPressed: () => print('Login Button Pressed'),
+          onPressed: () async {
+            print(_email);
+            print(_password);
+            dynamic result = await _auth.registerWithEmailAndPassword(
+                _email, _password, _healtCardNo, _name);
+            if (result == null) {
+              print('error please');
+            } else {
+              print('registered');
+            }
+          },
           padding: EdgeInsets.all(15.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
@@ -74,7 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildGenericTF(String label, String message) {
+  Widget _buildEmailTF(String label, String message) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -87,7 +114,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -99,6 +126,111 @@ class _SignUpScreenState extends State<SignUpScreen> {
               hintText: message,
               hintStyle: kHintTextStyle,
             ),
+            onChanged: (val) {
+              setState(() => _email = val);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHealthCardNoTF(String label, String message) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(14),
+              hintText: message,
+              hintStyle: kHintTextStyle,
+            ),
+            onChanged: (val) {
+              setState(() => _healtCardNo = val);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNameTF(String label, String message) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(14),
+              hintText: message,
+              hintStyle: kHintTextStyle,
+            ),
+            onChanged: (val) {
+              setState(() => _name = val);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordTF(String label, String message) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(14),
+              hintText: message,
+              hintStyle: kHintTextStyle,
+            ),
+            onChanged: (val) {
+              setState(() => _password = val);
+            },
           ),
         ),
       ],
@@ -130,13 +262,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontSize: 35.0,
                           fontWeight: FontWeight.bold)),
                   SizedBox(height: 20),
-                  _buildGenericTF('Email', 'Enter your email'),
+                  _buildEmailTF('Email', 'Enter your email'),
                   SizedBox(height: 20),
-                  _buildGenericTF('Health Card No.', 'XXXX-XXX-XXX-AB'),
+                  _buildHealthCardNoTF('Health Card No.', 'XXXX-XXX-XXX-AB'),
                   SizedBox(height: 20),
-                  _buildGenericTF('Password', 'Enter your password'),
+                  _buildNameTF('Password', 'Enter your password'),
                   SizedBox(height: 20),
-                  _buildGenericTF('Confirm Password', 'Re-enter your password'),
+                  _buildPasswordTF(
+                      'Confirm Password', 'Re-enter your password'),
                   SizedBox(height: 20),
                   _buildSignUpBtn(),
                   SizedBox(height: 20),

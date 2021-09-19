@@ -6,6 +6,8 @@ import 'package:vax_pass_flutter/screens/dashboard_screen.dart';
 import 'package:vax_pass_flutter/screens/sign_up_screen.dart';
 import 'package:vax_pass_flutter/utils/constants.dart';
 
+import 'package:vax_pass_flutter/service/auth.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen() : super();
 
@@ -14,6 +16,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthService _auth = AuthService();
+
+  String _email = '';
+  String _password = '';
+
   Widget _buildSignupBtn() {
     return GestureDetector(
       onTap: () => {
@@ -54,10 +61,16 @@ class _LoginScreenState extends State<LoginScreen> {
         width: double.infinity,
         child: RaisedButton(
           elevation: 5.0,
-          onPressed: () => {
-            print('Login Button Pressed'),
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => DashboardScreen()))
+          onPressed: () async {
+            print('Login Button Pressed');
+            dynamic result =
+                await _auth.signInWithEmailAndPassword(_email, _password);
+            if (result == null) {
+              print('error please');
+            } else {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => DashboardScreen()));
+            }
           },
           padding: EdgeInsets.all(15.0),
           shape: RoundedRectangleBorder(
@@ -79,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildGenericTF(String label, String message) {
+  Widget _buildEmailTF(String label, String message) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -92,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -104,6 +117,43 @@ class _LoginScreenState extends State<LoginScreen> {
               hintText: message,
               hintStyle: kHintTextStyle,
             ),
+            onChanged: (val) {
+              setState(() => _email = val);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasswordTF(String label, String message) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(14),
+              hintText: message,
+              hintStyle: kHintTextStyle,
+            ),
+            onChanged: (val) {
+              setState(() => _password = val);
+            },
           ),
         ),
       ],
@@ -136,9 +186,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontSize: 35.0,
                             fontWeight: FontWeight.bold)),
                     SizedBox(height: 20),
-                    _buildGenericTF('Email', 'Enter your email'),
+                    _buildEmailTF('Email', 'Enter your email'),
                     SizedBox(height: 20),
-                    _buildGenericTF('Password', 'Enter your password'),
+                    _buildPasswordTF('Password', 'Enter your password'),
                     SizedBox(height: 20),
                     _buildLoginBtn(),
                     SizedBox(height: 20),
