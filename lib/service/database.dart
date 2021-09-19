@@ -27,7 +27,7 @@ class DatabaseService {
 
   Future<HealthRecord> getUserHealthRecord(String uid) async {
     DocumentSnapshot user = await userCollection.doc(uid).get();
-    String hcn = user['healthCardNo'];
+    String hcn = user['hno'];
     DocumentSnapshot vaxRecord = await vaxData.doc(hcn).get();
 
     return HealthRecord(

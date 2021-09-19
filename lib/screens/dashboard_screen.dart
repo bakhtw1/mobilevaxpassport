@@ -1,7 +1,5 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, unused_import
 
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -24,17 +22,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final AuthService _auth = AuthService();
   final DatabaseService _database = DatabaseService();
 
-  HealthRecord? _record;
-  UserData? _userData;
+  HealthRecord _record = HealthRecord(
+      dateOfBirth: "",
+      doseOneAgent: "",
+      doseOneDate: "",
+      doseOneLocation: "",
+      doseTwoAgent: "",
+      doseTwoDate: "",
+      doseTwoLocation: "");
+  UserData _userData = UserData(uid: "", name: "", email: "", healthCardNo: "");
 
-  _DashboardScreenState() {
-    _setHealthRecord();
-  }
-
-  void _setHealthRecord() async {
-    String uid = _auth.getUID();
+  Future<bool> _setHealthRecord() async {
+    String uid = await _auth.getUID();
     _record = await _database.getUserHealthRecord(uid);
     _userData = await _database.getUserData(uid);
+    return _record != null && _userData != null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      await _setHealthRecord();
+      setState(() {});
+    });
   }
 
   Widget _label(String label, String value) {
@@ -76,7 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _titleCard(String date, String hcn) {
+  Widget _titleCard(String name, String date, String hcn) {
     return FractionallySizedBox(
       widthFactor: 1.0,
       child: Container(
@@ -86,7 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: <Widget>[
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('Waqas Bakht',
+              child: Text(name,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontFamily: 'OpenSans',
@@ -100,14 +111,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _qrCard() {
+  Widget _qrCard(String data) {
     return FractionallySizedBox(
       widthFactor: 1.0,
       child: Container(
           padding: EdgeInsets.fromLTRB(5, 5, 5, 5),
           decoration: titleBoxDecorationStyle,
           child: QrImage(
-            data: 'Waaaariq',
+            data: data,
             version: QrVersions.auto,
             size: 350,
             gapless: false,
@@ -133,23 +144,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    _titleCard(_record!.dateOfBirth, _userData!.healthCardNo),
+                    _titleCard(_userData.name, _record.dateOfBirth,
+                        _userData.healthCardNo),
                     SizedBox(height: 10),
-                    _dosageCard(
-                        "Dose 1",
-                        "Covid-19 mRNA",
-                        _record!.doseOneAgent,
-                        _record!.doseOneLocation,
-                        _record!.doseOneDate),
+                    _dosageCard("Dose 1", "Covid-19 mRNA", _record.doseOneAgent,
+                        _record.doseOneLocation, _record.doseOneDate),
                     SizedBox(height: 10),
-                    _dosageCard(
-                        "Dose 2",
-                        "Covid-19_mRNA",
-                        _record!.doseTwoAgent,
-                        _record!.doseTwoLocation,
-                        _record!.doseTwoDate),
+                    _dosageCard("Dose 2", "Covid-19_mRNA", _record.doseTwoAgent,
+                        _record.doseTwoLocation, _record.doseTwoDate),
                     SizedBox(height: 10),
-                    _qrCard()
+                    _qrCard(_userData.healthCardNo)
                   ],
                 )),
           )

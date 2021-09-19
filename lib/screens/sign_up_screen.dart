@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vax_pass_flutter/screens/sign_in_screen.dart';
 import 'package:vax_pass_flutter/utils/constants.dart';
-
+import 'package:vax_pass_flutter/screens/dashboard_screen.dart';
 import 'package:vax_pass_flutter/service/auth.dart';
 
 class SignUpForm {
@@ -78,7 +78,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (result == null) {
               print('error please');
             } else {
-              print('registered');
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => DashboardScreen()));
             }
           },
           padding: EdgeInsets.all(15.0),
@@ -266,7 +267,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SizedBox(height: 20),
                   _buildHealthCardNoTF('Health Card No.', 'XXXX-XXX-XXX-AB'),
                   SizedBox(height: 20),
-                  _buildNameTF('Password', 'Enter your password'),
+                  _buildNameTF('Name', 'Enter your full name'),
                   SizedBox(height: 20),
                   _buildPasswordTF(
                       'Confirm Password', 'Re-enter your password'),

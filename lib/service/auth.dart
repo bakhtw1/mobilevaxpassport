@@ -16,7 +16,7 @@ class AuthService {
   }
 
   String getUID() {
-    return _auth.currentUser.uid;
+    return _auth.currentUser!.uid;
   }
 
   // sign in with email and password
@@ -30,6 +30,7 @@ class AuthService {
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided for that user.');
       }
+      return null;
     }
 
     return _auth.currentUser;
